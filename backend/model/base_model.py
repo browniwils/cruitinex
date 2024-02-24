@@ -1,40 +1,46 @@
 """Base module for models."""
-import json
 from uuid import uuid4
 from datetime import datetime
+from sqlalchemy import Column
+from sqlalchemy import DateTime
+from sqlalchemy import String
 
 
 class BaseModel:
     """Base user class for user models."""
+    id = Column("id", String(36), primary_key=True)
+    created_at = Column("created_at", DateTime, default=datetime.utcnow())
+    updated_at = Column("updated_at", DateTime, default=datetime.utcnow())
+
     def __init__(self, *args, **kwargs) -> None:
         """Instanciate new object."""
-        self.__dict__ = dict()
         self.id = str(uuid4())
         self.created_at = datetime.utcnow()
         self.updated_at = datetime.utcnow()
-        self.model = self.__class__.__name__
 
         if kwargs:
             for key, val in kwargs.items():
                 setattr(self, key, val)
-                self.__dict__.update({key: val})
             if kwargs.get("created_at", None) and type(self.created_at) is str:
-                self.created_at = datetime.fromisoformat(kwargs["created_at"])
-                print("26", self.created_at)
-                self.__dict__.update({"created_at": self.created_at})
+                self.created_at = datetime.fromisoformat(
+                    kwargs.get("created_at"))
 
             if kwargs.get("updated_at", None) and type(self.updated_at) is str:
-                self.updated_at = datetime.fromisoformat(kwargs["updated_at"])
-                print("31",  self.updated_at)
-                self.__dict__.update({"updated_at": self.updated_at})
+                self.updated_at = datetime.fromisoformat(
+                    kwargs.get("updated_at"))
 
             if kwargs.get("id", None) is None:
                 self.id = str(uuid4())
-                self.__dict__.update({"id": self.id})
+
+    def __str__(self):
+        return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
     def view(self):
         """Displays user data."""
-        self.__dict__.update({"created_at": self.created_at.isoformat()})
-        self.__dict__.update({"updated_at": self.updated_at.isoformat()})
-        self.__dict__.update({"model": self.model})
-        return self.__dict__
+        view_properties = self.__dict__.copy()
+        view_properties.update({"created_at": self.created_at.isoformat()})
+        view_properties.update({"updated_at": self.updated_at.isoformat()})
+        if "_sa_instance_state" in view_properties.keys():
+            del view_properties["_sa_instance_state"]
+
+        return view_properties

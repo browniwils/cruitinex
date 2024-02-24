@@ -1,7 +1,9 @@
 #!/bin/usr/python3
 """Database module for crutinex database storing."""
 from sqlalchemy import create_engine
-# from model import Base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import scoped_session
+from model import Base
 
 
 class DBStorage:
@@ -10,35 +12,50 @@ class DBStorage:
     _db_session = ""
     _db_engine = ""
 
-    def __init__(self, dialect: str, db_host: str, db_port: str,
-                 db_user: str, db_pass: str, db_name: str) -> None:
-        connect_db = f'{dialect}://{db_user}:{db_pass}@{db_host}:{db_port}/{db_name}'
+    def __init__(self, *args, **kwargs):
+        # connect_db = "{}+{}://{}:{}@{}:{}/{}".format(
+        #     driver, dialect, db_user, db_pass,
+        #     db_host, db_port, db_name
+        # )
+        connect_db = "sqlite:///sample.db"
         self._db_engine = create_engine(connect_db)
         self.load()
 
-    def new(self, new_obj) -> None:
+    def new(self, new_obj):
         """Stage new instance to database.
         Arg:
-            new_obj: SQLAlchemy model."""
-
+            new_obj: SQLAlchemy model object."""
         self._db_session.add(new_obj)
+        return self
 
     def save(self) -> None:
         """Save a staged instance to database"""
-        pass
+        self._db_session.commit()
 
-    def delete(self, obj=None) -> None:
+    def delete(self, obj=None):
         """Delete instance from database.
         Arg:
-            new_obj: SQLAlchemy model."""
+            new_obj: SQLAlchemy model object."""
+        if obj:
+            self._db_session.delete(obj)
+        return self
 
-        if not obj:
-            self._session.delete(obj)
+    def rollback(self):
+        """Rolls back current transaction."""
+        self._db_session.rollback()
 
-    # def load(self) -> None:
-    #     """Loads data from the database"""
+    def close(self):
+        """Removes method on the private session attribute"""
+        self._db_session.remove()
 
-    #     Base.metadata.create_all(self._db_engine)
-    #     sess_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
-    #     Session = scoped_session(sess_factory)
-    #     self._db_session = Session
+    def load(self):
+        """Loads data from the database"""
+        Base.metadata.create_all(self._db_engine)
+        sess_factory = sessionmaker(bind=self._db_engine,
+                                    expire_on_commit=False)
+        Session = scoped_session(sess_factory)
+        self._db_session = Session
+
+    def query(self, query):
+        """Query database."""
+        return self._db_session.query(query)

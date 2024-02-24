@@ -7,7 +7,7 @@ from api.v1 import app_views
 
 app = Flask(__name__)
 app.register_blueprint(app_views)
-app.url_map.strict_slashes = False
+app.url_map.strict_slashes = True
 cors = CORS(app, resources={r"/*": {"origins": ["*"]}})
 
 app.run(debug=True)
