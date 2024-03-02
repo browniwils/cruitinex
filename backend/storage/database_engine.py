@@ -18,7 +18,7 @@ class DBStorage:
         #     db_host, db_port, db_name
         # )
         connect_db = "sqlite:///sample.db"
-        self._db_engine = create_engine(connect_db)
+        self._db_engine = create_engine(connect_db, pool_size=2000)
         self.load()
 
     def new(self, new_obj):
@@ -39,6 +39,10 @@ class DBStorage:
         if obj:
             self._db_session.delete(obj)
         return self
+
+    # def update(self, **kwargs):
+    #     """Update instance."""
+    #     self.query()
 
     def rollback(self):
         """Rolls back current transaction."""

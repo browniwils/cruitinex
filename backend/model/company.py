@@ -3,7 +3,7 @@
 from model import Base
 from model.base_model import BaseModel
 from model.address import Address
-from model.user import User
+# from model.user import User
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
