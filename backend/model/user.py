@@ -4,7 +4,7 @@ from model import Base
 from model.base_model import BaseModel
 from model.company import Company
 # from model.job import AppliedJob
-from model.privilage import Privilage
+from model.privilege import Privilege
 from model.user_type import UserType
 from sqlalchemy import Column
 from sqlalchemy import DateTime
@@ -32,12 +32,8 @@ class User(BaseModel, Base):
     user_type_id = Column("user_type_id", String(36),
                           ForeignKey("user_types.id"))
     applied_jobs = relationship("AppliedJob", backref="users")
-    privilage = Column("privilage_id",
-                       ForeignKey("privilages.id"))
+    privilage = Column("privilege_id",
+                       ForeignKey("privileges.id"))
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-
-    def create_session():
-        """"""
-        
