@@ -1,6 +1,7 @@
 #!/bin/usr/python3
 """Module for handling login API endpoints."""
 from api.v1 import app_views
+from base64 import b64encode
 from flask import abort
 from flask import jsonify
 from flask import request as req
@@ -25,15 +26,17 @@ def login():
     user.session_token = session_token
     db_engine.save()
     response = jsonify({"data": user.view(), "message": "success"}), 200
-    response.set_cookie("session_token", session_token)
+    encoded_session_token = b64encode(session_token.encode())
+    response.set_cookie("session_id", encoded_session_token.decode())
     return response
 
-@app_views.route("/users/logout")
+@app_views.route("/users/logout", methods=["DELETE"])
 def logout():
     """Log user out."""
-    session_token = req.cookies.get("session_token")
+    session_token = req.cookies.get("session_id")
     user = db_engine.query(User).filter_by(session_token=session_token)
     user.session_token = None
     db_engine.save()
-    return jsonify({"message": "success"}), 200
-
+    response = jsonify({"message": "success"}), 200
+    response.set_cookie("session_id", "")
+    return response
