@@ -12,25 +12,24 @@ def status():
 
 
 @app_views.errorhandler(400)
-def field_error(error):
+def bad_request(error):
     """Handles bad request error."""
-    return jsonify( {"message": "Bad request."}), 400
+    return jsonify({"message": "Bad Request."}), 400
 
 
 @app_views.errorhandler(401)
-def field_error(error):
+def unauthorized(error):
     """Handles unauthorized request error."""
-    return jsonify( {"message": "Unauthorized."}), 401
+    return jsonify({"message": "Unauthorized."}), 401
 
 
 @app_views.errorhandler(403)
-def field_error(error):
+def forbidden(error):
     """Handles forbidden request error."""
-    return jsonify( {"message": "Forbidden."}), 403
+    return jsonify({"message": "Forbidden."}), 403
 
 
 @app_views.errorhandler(404)
-def resouce_not_found(error):
+def not_found(error):
     """Handle not found error."""
     return jsonify({"message": "Not Found."}), 404
-
