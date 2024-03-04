@@ -3,7 +3,6 @@
 from model import Base
 from model.base_model import BaseModel
 from model.address import Address
-# from model.user import User
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
@@ -16,6 +15,7 @@ class Company(BaseModel, Base):
     name = Column("name", String(128), nullable=False)
     address = Column("address", ForeignKey("addresses.id"), nullable=False)
     website = Column("website", String(128), nullable=False)
+
     employees = relationship("User", backref="companies")
     departments = relationship("Department", backref="companies")
 
@@ -24,11 +24,12 @@ class Company(BaseModel, Base):
 
 
 class Department(BaseModel, Base):
-    """Copmany object model."""
+    """Department object model."""
     __tablename__ = "departments"
     name = Column("name", String(128), nullable=False)
     company_id = Column("company_id",
                         ForeignKey("companies.id"), nullable=False)
+
     employees = relationship("User", backref="departments")
 
     def __init__(self, *args, **kwargs) -> None:
