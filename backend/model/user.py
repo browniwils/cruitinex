@@ -46,9 +46,10 @@ class User(BaseModel, Base):
     @password.setter
     def password(self, pass_value):
         """set user password"""
-        self.__password = self.__hash_password(pass_value)
+        self.__password = self.hash_password(pass_value)
 
-    def __hash_password(self, value):
+    @classmethod
+    def hash_password(cls, value):
         """Hash passowrds."""
         value = str(value)
         hash_object = hashlib.sha256()
