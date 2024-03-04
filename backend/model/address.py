@@ -2,6 +2,7 @@
 """Address module for crutinex application."""
 from model import Base
 from model.base_model import BaseModel
+# from model.company import Company
 from sqlalchemy import Column
 from sqlalchemy import String
 from sqlalchemy.orm import relationship
@@ -14,6 +15,10 @@ class Address(BaseModel, Base):
     state = Column("state", String(128), nullable=False)
     zip_code = Column("zip_code", String(128), nullable=False)
     country = Column("country", String(128), nullable=False)
+
+    companies = relationship("Company", backref="addresses")
+    users = relationship("User", backref="addresses")
+    jobs = relationship("Job", backref="addresses")
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
