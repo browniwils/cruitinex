@@ -38,9 +38,10 @@ class BaseModel:
     def view(self):
         """Displays user data."""
         view_properties = self.__dict__.copy()
-        view_properties.update({"created_at": self.created_at.isoformat()})
-        view_properties.update({"updated_at": self.updated_at.isoformat()})
         if "_sa_instance_state" in view_properties.keys():
             del view_properties["_sa_instance_state"]
+        for key, value in self.__dict__.items():
+            if isinstance(value, datetime):
+                view_properties.update({key: value.isoformat()})
 
         return view_properties
