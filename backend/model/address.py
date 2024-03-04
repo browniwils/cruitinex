@@ -2,7 +2,7 @@
 """Address module for crutinex application."""
 from model import Base
 from model.base_model import BaseModel
-# from model.company import Company
+from model.job import Job
 from sqlalchemy import Column
 from sqlalchemy import String
 from sqlalchemy.orm import relationship
