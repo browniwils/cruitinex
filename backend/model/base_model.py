@@ -40,6 +40,8 @@ class BaseModel:
         view_properties = self.__dict__.copy()
         if "_sa_instance_state" in view_properties.keys():
             del view_properties["_sa_instance_state"]
+        if "__password" in view_properties.keys():
+            del view_properties["__password"]
         for key, value in self.__dict__.items():
             if isinstance(value, datetime):
                 view_properties.update({key: value.isoformat()})
