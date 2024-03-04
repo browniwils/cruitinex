@@ -1,5 +1,6 @@
 #!/bin/usr/python3
 """User module for application."""
+import hashlib
 from model import Base
 from model.base_model import BaseModel
 from model.company import Company
@@ -19,7 +20,7 @@ class User(BaseModel, Base):
     last_name =  Column("last_name", String(128), nullable=False)
     username =  Column("username", String(128), nullable=False)
     email =  Column("email", String(128), nullable=False)
-    password =  Column("password", String(128), nullable=False)
+    __password =  Column("password", String(128), nullable=False)
     phone =  Column("phone", String(12))
     reset_token =  Column("reset_token", String(36))
     session_token =  Column("session_token", String(36))
@@ -36,3 +37,20 @@ class User(BaseModel, Base):
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+
+    @property
+    def password(self):
+        """get user password"""
+        return self.__password
+
+    @password.setter
+    def password(self, pass_value):
+        """set user password"""
+        self.__password = self.__hash_password(pass_value)
+
+    def __hash_password(self, value):
+        """Hash passowrds."""
+        value = str(value)
+        hash_object = hashlib.sha256()
+        hash_object.update(value.encode())
+        return hash_object.hexdigest()
