@@ -1,6 +1,7 @@
 #!/bin/usr/python3
 """Helper modules for API endpoints."""
 from datetime import datetime
+from model.user import User
 from math import ceil
 from flask import abort
 from flask import jsonify
@@ -86,3 +87,10 @@ def delete_entry(model, id):
     db_engine.delete(entry).save()
     return jsonify(operation="successful",), 204
 
+
+def get_workers(work_type):
+    """Retrieve all works."""
+    workers = db_engine.query(User).filter_by(user_type=work_type).all()
+    data = [worker.view() for worker in workers]
+    paginated_data = pagination(1, 10, data)
+    return jsonify(paginated_data), 200
