@@ -36,12 +36,19 @@ class BaseModel:
         return f"[{self.__class__.__name__}] ({self.id}) {self.__dict__}"
 
     def view(self):
-        """Displays user data."""
+        """Displays user data without unwanted properties."""
         view_properties = self.__dict__.copy()
-        if "_sa_instance_state" in view_properties.keys():
-            del view_properties["_sa_instance_state"]
+        unwanted_properties = [
+            "_sa_instance_state",
+            "_User__password",
+            "session_token",
+            "reset_token",
+            "privilage_id"
+            ]
         for key, value in self.__dict__.items():
             if isinstance(value, datetime):
                 view_properties.update({key: value.isoformat()})
+            if key in unwanted_properties:
+                del view_properties[key]
 
         return view_properties
