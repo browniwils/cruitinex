@@ -29,7 +29,7 @@ class User(BaseModel, Base):
     department_id = Column("department_id", ForeignKey("departments.id"))
     user_type_id = Column("user_type_id", String(36),
                           ForeignKey("user_types.id"))
-    privilage = Column("privilege_id",
+    privilage_id = Column("privilege_id",
                        ForeignKey("privileges.id"))
 
     applied_jobs = relationship("AppliedJob", backref="users")

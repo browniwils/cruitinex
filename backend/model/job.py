@@ -2,7 +2,7 @@
 """Job module for application."""
 from model import Base
 from model.base_model import BaseModel
-from model.user import User
+# from model.user import User
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import ForeignKey
