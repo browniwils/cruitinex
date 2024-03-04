@@ -14,6 +14,7 @@ class Privilege(BaseModel, Base):
     """User type model object."""
     __tablename__ = "privileges"
     name = Column("name", String(128), nullable=False)
+
     roles = relationship("Role", secondary="privilege_role")
 
     def __init__(self, *args, **kwargs) -> None:
@@ -24,7 +25,6 @@ class Role(BaseModel, Base):
     """Roles table for privilege."""
     __tablename__ = "roles"
     name = Column("role", String(10), nullable=False)
-
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
