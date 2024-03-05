@@ -18,7 +18,8 @@ def add_admin_user():
         last_name="",
         password="admin123",
         email="admin@cruitinex.local",
-        username="admin"
+        username="admin",
+        gender="M"
     )
     roles = ["read", "create", "update", "delete"]
     roles = add_roles(roles)
