@@ -8,6 +8,7 @@ from model.privilege import Privilege
 from model.user_type import UserType
 from sqlalchemy import Column
 from sqlalchemy import DateTime
+from sqlalchemy import Enum
 from sqlalchemy import ForeignKey
 from sqlalchemy import String
 from sqlalchemy.orm import relationship
@@ -21,6 +22,7 @@ class User(BaseModel, Base):
     username =  Column("username", String(128), nullable=False)
     email =  Column("email", String(128), nullable=False)
     __password =  Column("password", String(128), nullable=False)
+    gender =  Column("gender", Enum("M", "F"), nullable=False)
     phone =  Column("phone", String(12))
     reset_token =  Column("reset_token", String(36))
     session_token =  Column("session_token", String(36))
