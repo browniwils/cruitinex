@@ -43,7 +43,10 @@ class BaseModel:
             "_User__password",
             "session_token",
             "reset_token",
-            "privilage_id"
+            "privilage_id",
+            "created_at",
+            "updated_at",
+            "_dead_line"
             ]
         for key, value in self.__dict__.items():
             if isinstance(value, datetime):

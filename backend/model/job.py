@@ -19,7 +19,7 @@ class Job(BaseModel, Base):
     description = Column("description", String(), nullable=False)
     salary = Column("salary", Integer)
     type = Column("type", Enum("on-site", "remote", "hybrid"))
-    _dead_line = Column("dead_line", DateTime, nullable=False)
+    expires = Column("dead_line", DateTime, nullable=False)
     user_id = Column("user_id", ForeignKey("users.id"), nullable=False)
     address_id = Column("address_id", ForeignKey("addresses.id"))
 
@@ -29,7 +29,7 @@ class Job(BaseModel, Base):
     @property
     def dead_line(self):
         """get attribute dead_line."""
-        return self._dead_line
+        return self.expires
 
     @dead_line.setter
     def dead_line(self, value):
@@ -39,7 +39,7 @@ class Job(BaseModel, Base):
         except ValueError:
             dl = datetime.now()
         finally:
-            self._dead_line = dl
+            self.expires = dl
 
 class AppliedJob(BaseModel, Base):
     """class for applied jobs."""
