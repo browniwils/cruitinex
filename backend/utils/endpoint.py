@@ -32,7 +32,12 @@ def pagination(page_start, page_size, data):
 
 def get_all(model):
     """Get all records from model."""
-    data_entries = db_engine.query(model).all()
+
+    if model.__name__ == User.__name__:
+        data_entries = db_engine.query(model).filter(
+            model.username != "admin").all()
+    else:
+        data_entries = db_engine.query(model).all()
     data = [data.view() for data in data_entries]
     paginated_data = pagination(1, 10, data)
     return jsonify(paginated_data), 200
@@ -90,7 +95,8 @@ def delete_entry(model, id):
 
 def get_workers(work_type):
     """Retrieve all works."""
-    workers = db_engine.query(User).filter_by(user_type=work_type).all()
+    workers = db_engine.query(User).filter(
+        User.username != "admin").filter_by(user_type=work_type).all()
     data = [worker.view() for worker in workers]
     paginated_data = pagination(1, 10, data)
     return jsonify(paginated_data), 200
