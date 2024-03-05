@@ -1,8 +1,9 @@
 #!/bin/usr/python3
 """Module for handling login API endpoints."""
-import hashlib
+import json
 from api.v1 import app_views
 from base64 import b64encode
+from base64 import b64decode
 from datetime import datetime
 from datetime import timedelta
 from flask import abort
@@ -13,7 +14,7 @@ from storage import db_engine
 from uuid import uuid4
 
 
-@app_views.route("/users/login", methods=["POST"])
+@app_views.route("/login", methods=["POST"])
 def login():
     """Log user in."""
     body = req.get_json()
@@ -30,27 +31,34 @@ def login():
         abort(404)
     token = str(uuid4())
     session_created_at = datetime.now()
-    session_expires_at = session_created_at + timedelta(minutes=30)
-    session_token = {
+    session_expires_at = session_created_at + timedelta(days=2)
+    session_token = json.dumps({
         "email": user.email,
         "session_token": token,
         "session_created_at": session_created_at.isoformat(),
         "session_expires_at": session_expires_at.isoformat(),
-        }
+        })
     encoded_session_token = b64encode(session_token.encode())
-    user.session_token = session_token
+    user.session_token = encoded_session_token.decode()
     db_engine.save()
-    response = jsonify({"data": user.view(), "message": "success"}), 200
-    response.set_cookie("session_id", encoded_session_token.decode())
-    return response
+    response = jsonify(message="successful login")
+    response.set_cookie("session_id", encoded_session_token.decode(),
+                        expires=session_expires_at)
+    return response, 200
 
-@app_views.route("/users/logout", methods=["DELETE"])
+@app_views.route("/logout", methods=["DELETE"])
 def logout():
     """Log user out."""
     session_token = req.cookies.get("session_id")
-    user = db_engine.query(User).filter_by(session_token=session_token)
-    user.session_token = None
-    db_engine.save()
+    if session_token:
+        decoded_token = b64decode(session_token.encode()).decode()
+        session_token = decoded_token.get("session_token")
+        if session_token:
+            user = db_engine.query(User).filter_by(
+                session_token=session_token).first()
+            if user:
+                user.session_token = None
+                db_engine.save()
     response = jsonify({"message": "success"}), 200
-    response.set_cookie("session_id", "")
+    response.set_cookie("session_id", None)
     return response
