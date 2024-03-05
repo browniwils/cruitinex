@@ -1,5 +1,6 @@
 #!/bin/usr/python3
 """Job module for application."""
+from datetime import datetime
 from model import Base
 from model.base_model import BaseModel
 # from model.user import User
@@ -18,13 +19,27 @@ class Job(BaseModel, Base):
     description = Column("description", String(), nullable=False)
     salary = Column("salary", Integer)
     type = Column("type", Enum("on-site", "remote", "hybrid"))
-    dead_line = Column("dead_line", DateTime, nullable=False)
+    _dead_line = Column("dead_line", DateTime, nullable=False)
     user_id = Column("user_id", ForeignKey("users.id"), nullable=False)
     address_id = Column("address_id", ForeignKey("addresses.id"))
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
+    @property
+    def dead_line(self):
+        """get attribute dead_line."""
+        return self._dead_line
+
+    @dead_line.setter
+    def dead_line(self, value):
+        """set attribute dead_line's value."""
+        try:
+            dl = datetime.fromisoformat(value)
+        except ValueError:
+            dl = datetime.now()
+        finally:
+            self._dead_line = dl
 
 class AppliedJob(BaseModel, Base):
     """class for applied jobs."""
