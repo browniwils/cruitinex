@@ -1,9 +1,8 @@
 """Authentication module for protecting API endpoints."""
-import json
 from api.v1.routes.index import FORBIDDEN_CODE
 from api.v1.routes.index import UNAUTHORIZED_CODE
-from base64 import b64decode
 from datetime import datetime
+from datetime import timedelta
 from flask import abort
 from flask import jsonify
 from flask import request as req
@@ -27,41 +26,14 @@ def authentication_required(func):
         if len(token) != TOKEN_SIZE:
             abort(FORBIDDEN_CODE)
 
-        request_token = token[1]
-        decode_request_session = b64decode(request_token.encode()).decode()
-        decode_request_session = json.loads(decode_request_session)
-
-        user_email = decode_request_session.get("email")
-        if not user_email:
-            abort(FORBIDDEN_CODE)
-
-        request_session_token = decode_request_session.get("session_token")
-        if not request_session_token:
-            abort(FORBIDDEN_CODE)
-
-        user = db_engine.query(User).filter_by(email=user_email).first()
+        session_token = token[1]
+        user = db_engine.query(User).filter_by(
+            session_token=session_token).first()
         if not user:
             abort(FORBIDDEN_CODE)
 
-        if not user.session_token:
-            abort(FORBIDDEN_CODE)
-
-        user_session = user.session_token
-        decode_user_session = b64decode(user_session.encode())
-        decode_user_session = json.loads(decode_user_session.decode())
-        user_session_token = decode_user_session.get("session_token")
-        if not user_session_token:
-            abort(FORBIDDEN_CODE)
-    
-        if user_session_token != request_session_token:
-            abort(FORBIDDEN_CODE)
-
-        session_expires_at = decode_user_session.get("session_expires_at")
-        if not session_expires_at:
-            abort(FORBIDDEN_CODE)
-
         now = datetime.now()
-        expires_at = datetime.fromisoformat(session_expires_at)
+        expires_at = user.updated_at + timedelta(days=1.5)
         if now >= expires_at:
             user.session_token = None
             db_engine.save()
@@ -83,19 +55,10 @@ def authorization_required(auth):
             if not user:
                 abort(UNAUTHORIZED_CODE)
 
-            decoded_token = b64decode(session_token.encode())
-            decoded_token = json.loads(decoded_token.decode())
-            session_token_id = decoded_token.get("session_token")
-            if not session_token_id:
+            if user.session_token == "NULL":
                 abort(UNAUTHORIZED_CODE)
 
-            user_session_token = b64decode(user.session_token.encode())
-            user_session_token = json.loads(user_session_token.decode())
-            user_session_token_id = decoded_token.get("session_token")
-            if not user_session_token_id:
-                abort(UNAUTHORIZED_CODE)
-
-            if user_session_token_id != session_token_id:
+            if user.session_token != session_token:
                 abort(UNAUTHORIZED_CODE)
 
             user_auths = db_engine.query(Privilege).filter_by(
